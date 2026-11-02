@@ -1,0 +1,6 @@
+<header class="site-header" [class.menu-is-open]="menuOpen">
+  <a class="brand" routerLink="/" aria-label="Coffee Shop home" (click)="closeMenu()"><img src="/assets/footer-logo.avif" alt="Coffee Shop"></a>
+  <button class="menu-toggle" type="button" [attr.aria-expanded]="menuOpen" [attr.aria-label]="menuOpen ? 'Close navigation' : 'Open navigation'" (click)="toggleMenu()"><span></span><span></span></button>
+  <nav class="main-nav" [class.open]="menuOpen" aria-label="Main navigation"><a routerLink="/about" routerLinkActive="active" (click)="closeMenu()">ABOUT</a><a routerLink="/menu" routerLinkActive="active" (click)="closeMenu()">MENU</a><a routerLink="/branch" routerLinkActive="active" (click)="closeMenu()">BRANCH</a><a routerLink="/contact" routerLinkActive="active" (click)="closeMenu()">CONTACT</a></nav>
+  <a class="pill reservation" routerLink="/contact" fragment="reservation">RESERVATION</a>
+</header>

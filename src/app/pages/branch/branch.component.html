@@ -1,0 +1,4 @@
+<main class="interior-page branch-page"><section class="interior-hero branch-hero"><h1>FIND YOUR<br>PERFECT CAFE</h1><img src="/assets/branch-hero.avif" alt="Coffee beans and a location marker"></section>
+  <section class="branch-section branch-list section-pad" appReveal><div class="section-title"><h2>FIND YOUR<br>PERFECT BREW</h2></div><div class="branch-grid"><article class="branch-card" *ngFor="let branch of branches; let i = index" appReveal [style.--item-index]="i"><img [src]="'/assets/' + branch.image" [alt]="branch.name"><div class="branch-info"><div><h3>{{ branch.name }}</h3><a [href]="'https://maps.google.com/?q=' + branch.address" target="_blank" rel="noreferrer">GET DIRECTIONS ↗</a></div><p>{{ branch.street }}<br>{{ branch.city }}</p><p>Monday – Sunday<br>{{ branch.hours }}</p></div></article></div></section>
+  <app-reviews /><app-ticker [bottom]="true" />
+</main>

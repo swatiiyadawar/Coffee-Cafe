@@ -1,0 +1,1 @@
+<section class="faq-section section-pad" appReveal><h2>EVERYTHING YOU<br>NEED TO KNOW</h2><div class="faq-list"><details *ngFor="let question of questions; let i = index" [open]="openIndex === i"><summary (click)="$event.preventDefault(); toggle(i)">{{ question[0] }}<span>{{ openIndex === i ? '−' : '+' }}</span></summary><p>{{ question[1] }}</p></details></div></section>

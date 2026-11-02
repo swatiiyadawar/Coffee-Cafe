@@ -1,0 +1,12 @@
+<main class="interior-page reservation-page"><section class="interior-hero reservation-hero"><h1>RESERVE YOUR<br>PERFECT TABLE</h1><img src="/assets/contact-hero.avif" alt="Coffee ready to share at the table"></section>
+  <section class="reservation-panel" id="reservation" appReveal><h2>BOOK YOUR COFFEE<br>EXPERIENCE</h2><form class="booking-form" #booking="ngForm" (ngSubmit)="reserve(booking)">
+    <label>Your Name<input name="name" ngModel autocomplete="name" placeholder="Enter your full name" required></label>
+    <label>Email Address<input name="email" ngModel type="email" autocomplete="email" placeholder="Enter your email address" required></label>
+    <label>Phone Number<input name="phone" ngModel type="tel" autocomplete="tel" placeholder="Enter your phone number" required></label>
+    <label>Select Café Location<select name="location" ngModel required><option value="" selected disabled>Choose your preferred location</option><option>The Reserve Coffee Shop — New York</option><option>The Roast Studio — Los Angeles</option><option>The Brew Lounge — Chicago</option><option>The Coffee Atelier — Seattle</option><option>The Velvet Roastery — Boston</option><option>The Artisan Brew House — San Francisco</option></select></label>
+    <label>Coffee Name<select name="coffee" ngModel required><option value="" selected disabled>Select your coffee</option><option>Classic Latte</option><option>Signature Espresso</option><option>Caramel Macchiato</option><option>Vanilla Cold Brew</option><option>Velvet Mocha</option><option>Hazelnut Cappuccino</option></select></label>
+    <label>Seating Preference<select name="seating" ngModel required><option value="" selected disabled>Choose your seating preference</option><option>Indoor</option><option>Patio</option><option>Window seat</option></select></label>
+    <label class="notes-field">Reservation Notes<textarea name="notes" ngModel rows="4" placeholder="Add any additional details for your reservation..."></textarea></label>
+    <button type="submit" class="pill dark-pill" [disabled]="sending">{{ sending ? 'SENDING…' : 'RESERVE MY TABLE' }} <span>↗</span></button><p class="reservation-response" [class.error]="hasError" role="status" aria-live="polite">{{ response }}</p>
+  </form></section><app-ticker [bottom]="true" />
+</main>
