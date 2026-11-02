@@ -104,4 +104,4 @@ const server = http.createServer(async (request, response) => {
   }
 });
 
-server.listen(PORT, () => console.log(`Reservation API listening on http://localhost:${PORT}`));
+server.listen(PORT, '0.0.0.0', () => console.log(`Reservation API listening on port ${PORT}`));
