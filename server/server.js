@@ -1,7 +1,8 @@
 const http = require('node:http');
 const nodemailer = require('nodemailer');
 
-const PORT = Number(process.env.API_PORT || 3000);
+const PORT = Number(process.env.PORT || process.env.API_PORT || 3000);
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || '';
 const RECIPIENT = 'swatiyadawar29@gmail.com';
 const MAX_BODY_BYTES = 10_000;
 const recentRequests = new Map();
@@ -36,9 +37,26 @@ function sendJson(response, status, payload) {
   response.end(JSON.stringify(payload));
 }
 
+function applyCors(response, request) {
+  const origin = request.headers.origin;
+  if (origin && origin === FRONTEND_ORIGIN) {
+    response.setHeader('access-control-allow-origin', origin);
+    response.setHeader('access-control-allow-methods', 'GET, POST, OPTIONS');
+    response.setHeader('access-control-allow-headers', 'content-type');
+    response.setHeader('vary', 'Origin');
+  }
+}
+
 const server = http.createServer(async (request, response) => {
-  if (request.method === 'GET' && request.url === '/api/health') return sendJson(response, 200, { ok: true });
-  if (request.method !== 'POST' || request.url !== '/api/reservations') return sendJson(response, 404, { message: 'Not found.' });
+  applyCors(response, request);
+  if (request.method === 'OPTIONS') {
+    response.writeHead(204);
+    return response.end();
+  }
+
+  const requestUrl = new URL(request.url || '/', `http://${request.headers.host || 'localhost'}`);
+  if (request.method === 'GET' && requestUrl.pathname === '/api/health') return sendJson(response, 200, { ok: true });
+  if (request.method !== 'POST' || requestUrl.pathname !== '/api/reservations') return sendJson(response, 404, { message: 'Not found.' });
 
   const clientKey = request.socket.remoteAddress || 'unknown';
   const lastRequest = recentRequests.get(clientKey) || 0;
