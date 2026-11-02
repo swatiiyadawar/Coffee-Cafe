@@ -1,3 +1,4 @@
-// Use the local proxy during development. Replace this with the deployed API URL
-// (for example, https://coffee-shop-api.onrender.com/api) before a production build.
-export const API_BASE_URL = 'https://coffee-cafe-5l6k.onrender.com/api';
+import { environment } from '../../environments/environment';
+
+export const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
+export const WEB3FORMS_ACCESS_KEY = environment.web3FormsAccessKey;

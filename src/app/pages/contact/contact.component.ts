@@ -15,12 +15,28 @@ export class ContactComponent {
     this.sending = true;
     this.response = '';
     this.hasError = false;
-    this.reservationService.send({ ...form.value, notes: form.value.notes ?? '' }).subscribe({
-      next: ({ message }) => { this.sending = false; this.response = message; form.resetForm(); },
+    this.reservationService.send({
+      name: form.value.name,
+      email: form.value.email,
+      phone: form.value.phone,
+      purpose: form.value.purpose,
+      preferred_date: form.value.preferred_date ?? '',
+      message: form.value.message,
+    }).subscribe({
+      next: ({ success, message }) => {
+        this.sending = false;
+        if (!success) {
+          this.hasError = true;
+          this.response = message || 'We could not send your inquiry right now. Please try again shortly.';
+          return;
+        }
+        this.response = message || 'Your inquiry has been sent successfully.';
+        form.resetForm();
+      },
       error: (error: { error?: { message?: string } }) => {
         this.sending = false;
         this.hasError = true;
-        this.response = error.error?.message || 'We could not send your reservation right now. Please try again shortly.';
+        this.response = error.error?.message || 'We could not send your inquiry right now. Please try again shortly.';
       },
     });
   }
