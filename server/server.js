@@ -2,7 +2,7 @@ const http = require('node:http');
 const nodemailer = require('nodemailer');
 
 const PORT = Number(process.env.PORT || process.env.API_PORT || 3000);
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || '';
+const FRONTEND_ORIGIN = process.env.FRONTEND_URL || process.env.FRONTEND_ORIGIN || '';
 const RECIPIENT = 'swatiyadawar29@gmail.com';
 const MAX_BODY_BYTES = 10_000;
 const recentRequests = new Map();
@@ -57,6 +57,7 @@ const server = http.createServer(async (request, response) => {
   const requestUrl = new URL(request.url || '/', `http://${request.headers.host || 'localhost'}`);
   if (request.method === 'GET' && requestUrl.pathname === '/api/health') return sendJson(response, 200, { ok: true });
   if (request.method !== 'POST' || requestUrl.pathname !== '/api/reservations') return sendJson(response, 404, { message: 'Not found.' });
+  console.info('Reservation request received');
 
   const clientKey = request.socket.remoteAddress || 'unknown';
   const lastRequest = recentRequests.get(clientKey) || 0;
@@ -68,10 +69,15 @@ const server = http.createServer(async (request, response) => {
     const values = Object.fromEntries(fields.map((field) => [field, String(form?.[field] ?? '').trim()]));
     values.notes = String(form?.notes ?? '').trim();
     if (fields.some((field) => !values[field]) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+      console.warn('Reservation validation failed: missing or invalid required field');
       return sendJson(response, 400, { message: 'Please provide a valid name, email, phone, location, coffee, and seating preference.' });
     }
-    if (Object.values(values).some((value) => value.length > 1200)) return sendJson(response, 400, { message: 'One or more fields are too long.' });
+    if (Object.values(values).some((value) => value.length > 1200)) {
+      console.warn('Reservation validation failed: field length exceeded');
+      return sendJson(response, 400, { message: 'One or more fields are too long.' });
+    }
     if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.error('Reservation email configuration is incomplete');
       return sendJson(response, 503, { message: 'Reservation email is not configured yet. Please contact the café directly.' });
     }
 
@@ -96,10 +102,18 @@ const server = http.createServer(async (request, response) => {
       html: `<h2>New reservation request</h2><table>${rows.map(([label, value]) => `<tr><th align="left" style="padding:6px 16px 6px 0">${label}</th><td style="padding:6px 0">${value}</td></tr>`).join('')}</table>`,
     });
     recentRequests.set(clientKey, Date.now());
+    console.info('Reservation email sent successfully');
     return sendJson(response, 200, { message: 'Your reservation request has been emailed to the café.' });
   } catch (error) {
     const status = error.statusCode || 500;
-    if (status >= 500) console.error('Reservation email failed:', error.message);
+    if (status >= 500) {
+      console.error('Reservation email failed:', {
+        code: error.code,
+        command: error.command,
+        responseCode: error.responseCode,
+        message: error.message,
+      });
+    }
     return sendJson(response, status, { message: status === 500 ? 'We could not send your reservation right now. Please try again shortly.' : error.message });
   }
 });
